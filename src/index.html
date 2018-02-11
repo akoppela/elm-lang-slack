@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html id="html">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">        
+        <meta name="description" content="Elm Language Slack">
+        <meta name="keywords" content="elm, slack">
+        <meta name="author" content="Andrey Koppel (akoppela)">
+        <title>Elm Language Slack</title>
+        <link rel="shortcut icon" sizes="16x16 32x32 48x48 64x64 128x128 256x256" type="image/x-icon" href="/favicon.ico">
+        <style>
+            .elm-overlay {
+                z-index: 9999;
+            }
+
+            html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
+                background: #fff;
+            }
+
+            .loading {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                color: #293c4b;
+                text-align: center;
+            }
+
+            .loading > p {
+                position: absolute;
+                left: 0;
+                top: 50%;
+                margin-top: -1em;
+                width: 100%;
+                height: 2em;
+                line-height: 2em;
+            }
+        </style>
+    </head>
+
+    <body id="body">
+        <div class="loading">
+            <p>Loading...</p>
+        </div>
+    </body>
+</html>

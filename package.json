@@ -1,0 +1,31 @@
+{
+  "name": "elm-lang-slack",
+  "version": "1.0.0",
+  "description": "Elm Language Slack official website",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/akoppela/elm-lang-slack.git"
+  },
+  "scripts": {
+    "start": "webpack-dev-server",
+    "build": "rimraf docker/build && webpack",
+    "update": "npm prune && npm install && elm package install"
+  },
+  "keywords": [
+    "Elm",
+    "Slack"
+  ],
+  "author": "Andrey Koppel (akoppela)",
+  "license": "BSD3",
+  "devDependencies": {
+    "copy-webpack-plugin": "4.3.1",
+    "elm": "0.18.0",
+    "elm-hot-loader": "0.5.4",
+    "elm-webpack-loader": "4.4.0",
+    "html-webpack-plugin": "2.30.1",
+    "rimraf": "2.6.2",
+    "webpack": "3.10.0",
+    "webpack-dev-server": "2.11.0",
+    "webpack-merge": "4.1.1"
+  }
+}
