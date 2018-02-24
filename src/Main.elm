@@ -443,6 +443,12 @@ viewPlot users hoveredBar size =
                 xOffset =
                     toSVGX point.x * 100 / summary.x.length
 
+                isLeft =
+                    (point.x - summary.x.min) < range summary.x / 4
+
+                isRight =
+                    (point.x - summary.x.min) > range summary.x * 3 / 4
+
                 verticalPosition =
                     let
                         top =
@@ -458,36 +464,52 @@ viewPlot users hoveredBar size =
                     , ( "pointer-events", "none" )
                     ]
             in
-            H.div [ HtmlA.style style ] [ inner hints ]
+            H.div [ HtmlA.style style ] [ inner hints isLeft isRight ]
 
-        customHintContainerInner hints =
+        customHintContainerInner hints isLeft isRight =
             let
+                shift attrs =
+                    if isLeft then
+                        ( "left", "100%" ) :: ( "margin-left", "-22px" ) :: attrs
+                    else if isRight then
+                        ( "right", "-22px" ) :: attrs
+                    else
+                        ( "right", "-50%" ) :: attrs
+
+                arrowShift attrs =
+                    if isLeft then
+                        ( "left", "14px" ) :: attrs
+                    else if isRight then
+                        ( "right", "14px" ) :: attrs
+                    else
+                        ( "left", "50%" ) :: ( "margin-left", "-6px" ) :: attrs
+
                 arrow =
                     H.div
-                        [ HtmlA.style
-                            [ ( "position", "absolute" )
-                            , ( "top", "100%" )
-                            , ( "left", "50%" )
-                            , ( "margin-left", "-6px" )
-                            , ( "width", "0" )
-                            , ( "height", "0" )
-                            , ( "border-left", "6px solid transparent" )
-                            , ( "border-right", "6px solid transparent" )
-                            , ( "border-top", "6px solid rgb(52, 73, 94)" )
-                            ]
+                        [ HtmlA.style <|
+                            arrowShift
+                                [ ( "position", "absolute" )
+                                , ( "top", "100%" )
+                                , ( "width", "0" )
+                                , ( "height", "0" )
+                                , ( "border-left", "6px solid transparent" )
+                                , ( "border-right", "6px solid transparent" )
+                                , ( "border-top", "6px solid rgb(52, 73, 94)" )
+                                ]
                         ]
                         []
             in
             H.div
-                [ HtmlA.style
-                    [ ( "line-height", "40px" )
-                    , ( "color", "white" )
-                    , ( "padding", "0 10px" )
-                    , ( "position", "relative" )
-                    , ( "right", "-50%" )
-                    , ( "background", "rgb(52, 73, 94)" )
-                    , ( "border-radius", "6px" )
-                    ]
+                [ HtmlA.style <|
+                    shift
+                        [ ( "line-height", "40px" )
+                        , ( "color", "white" )
+                        , ( "padding", "0 10px" )
+                        , ( "position", "relative" )
+                        , ( "background", "rgb(52, 73, 94)" )
+                        , ( "border-radius", "6px" )
+                        , ( "border", "2px solid #fff" )
+                        ]
                 ]
                 (arrow :: hints)
 
