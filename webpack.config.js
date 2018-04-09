@@ -90,11 +90,10 @@ if (TARGET_ENV === 'production') {
                     from: 'src/favicon.ico'
                 }
             ]),
-            new webpack.optimize.OccurrenceOrderPlugin(),
-            new webpack.optimize.UglifyJsPlugin({
-                minimize: true,
-                compressor: { warnings: false }
-            })
-        ]
+            new webpack.optimize.OccurrenceOrderPlugin()
+        ],
+        optimization: {
+            minimize: true
+        }
     });
 }
