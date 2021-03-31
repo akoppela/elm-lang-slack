@@ -1,29 +1,30 @@
 module Main exposing (main)
 
+import Browser
+import Browser.Events
 import Color
-import Element as E exposing (Attribute, Element)
-import Element.Area as Area
+import Element exposing (Attribute, Element)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events as Events
 import Element.Font as Font
+import Element.Region as Region
 import ElmLogo
-import Html as H exposing (Html)
-import Html.Attributes as HtmlA
+import Html exposing (Html)
+import Html.Attributes as HtmlAttr
 import Http
 import Json.Decode as Decode exposing (Decoder)
 import List.Extra as List
 import Maybe.Extra as Maybe
 import Plot
 import Regex exposing (Regex)
-import Svg.Attributes as SvgA
+import Svg.Attributes as SvgAttr
 import VerbalExpressions as VerEx
-import Window
 
 
 main : Program Flags Model Msg
 main =
-    H.programWithFlags
+    Browser.element
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -39,7 +40,7 @@ type alias Model =
     { users : RemoteData Users
     , channels : RemoteData (List Channel)
     , hoveredBar : Maybe Plot.Point
-    , windowSize : Window.Size
+    , windowSize : WindowSize
     }
 
 
@@ -52,6 +53,12 @@ initialModel { width, height } =
         { width = width
         , height = height
         }
+    }
+
+
+type alias WindowSize =
+    { width : Int
+    , height : Int
     }
 
 
@@ -149,38 +156,56 @@ type Msg
     | RequestChannels
     | ChannelsRequested (Result Http.Error (List Channel))
     | BarHovered (Maybe Plot.Point)
-    | WindowSizeChanged Window.Size
+    | WindowSizeChanged Int Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
-            ( model, Cmd.none )
+            ( model
+            , Cmd.none
+            )
 
         RequestUsers ->
-            ( { model | users = Loading }, requestUsers )
+            ( { model | users = Loading }
+            , requestUsers
+            )
 
         UsersRequested (Ok users) ->
-            ( { model | users = Data users }, Cmd.none )
+            ( { model | users = Data users }
+            , Cmd.none
+            )
 
         UsersRequested (Err _) ->
-            ( { model | users = Error }, Cmd.none )
+            ( { model | users = Error }
+            , Cmd.none
+            )
 
         RequestChannels ->
-            ( { model | channels = Loading }, requestChannels )
+            ( { model | channels = Loading }
+            , requestChannels
+            )
 
         ChannelsRequested (Ok channels) ->
-            ( { model | channels = Data channels }, Cmd.none )
+            ( { model | channels = Data channels }
+            , Cmd.none
+            )
 
         ChannelsRequested (Err _) ->
-            ( { model | channels = Error }, Cmd.none )
+            ( { model | channels = Error }
+            , Cmd.none
+            )
 
         BarHovered hoveredBar ->
-            ( { model | hoveredBar = hoveredBar }, Cmd.none )
+            ( { model | hoveredBar = hoveredBar }
+            , Cmd.none
+            )
 
-        WindowSizeChanged size ->
-            ( { model | windowSize = size }, Cmd.none )
+        WindowSizeChanged width height ->
+            ( { model | windowSize = WindowSize width height }
+            , Cmd.none
+            )
 
 
 requestUsers : Cmd Msg
@@ -195,11 +220,10 @@ requestChannels =
 
 requestFirebase : String -> Decoder a -> (Result Http.Error a -> msg) -> Cmd msg
 requestFirebase document decoder toMsg =
-    let
-        url =
-            "https://us-central1-elm-lang-slack.cloudfunctions.net/getData?document=" ++ document
-    in
-    Http.send toMsg (Http.get url decoder)
+    Http.get
+        { url = "https://us-central1-elm-lang-slack.cloudfunctions.net/getData?document=" ++ document
+        , expect = Http.expectJson toMsg decoder
+        }
 
 
 
@@ -208,7 +232,7 @@ requestFirebase document decoder toMsg =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Window.resizes WindowSizeChanged
+    Browser.Events.onResize WindowSizeChanged
 
 
 
@@ -217,7 +241,7 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    E.layout
+    Element.layout
         [ Font.family
             [ Font.external
                 { name = "Source Sans Pro"
@@ -229,13 +253,16 @@ view model =
             , Font.typeface "Helvetica Neue"
             , Font.sansSerif
             ]
-        , Font.color (Color.rgb 41 60 75)
+        , Font.color (Element.rgb255 41 60 75)
         , Font.size 24
         , Font.center
-        , Background.color Color.white
-        , E.paddingXY 15 100
+        , Background.color (Element.rgb255 255 255 255)
+        , Element.paddingXY 15 100
         ]
-        (E.column [ E.spacing 100 ]
+        (Element.column
+            [ Element.spacing 100
+            , Element.centerX
+            ]
             [ viewHeader model.users
             , viewChannels model.channels
             , viewTimeZones model.users model.hoveredBar model.windowSize
@@ -250,23 +277,28 @@ viewHeader remoteData =
         usersNumber =
             Maybe.unwrap "" .number (data remoteData)
     in
-    E.column [ E.spacing 50 ]
-        [ ElmLogo.element 70
-        , E.el
-            [ Area.heading 1
+    Element.column
+        [ Element.spacing 50
+        , Element.centerX
+        ]
+        [ Element.el [ Element.centerX ] (ElmLogo.element 70)
+        , Element.el
+            [ Region.heading 1
             , Font.size 120
-            , Font.lineHeight 1
-            , E.centerY
+            , Element.centerY
+            , Element.centerX
             ]
-            (E.text "elm")
-        , E.column
-            [ E.spacing 10 ]
-            [ E.paragraph [] [ E.text ("We are a community of " ++ usersNumber) ]
-            , E.paragraph [] [ E.text "Elm language developers from all over the world." ]
-            , E.paragraph [] [ E.text "Join us and talk on Slack!" ]
+            (Element.text "elm")
+        , Element.column
+            [ Element.spacing 10 ]
+            [ Element.paragraph [] [ Element.text ("We are a community of " ++ usersNumber) ]
+            , Element.paragraph [] [ Element.text "Elm language developers from all over the world." ]
+            , Element.paragraph [] [ Element.text "Join us and talk on Slack!" ]
             ]
-        , viewButton "http://elmlang.herokuapp.com/" "Join Now"
-        , viewLink elmSlack "Already a member? Sign in here."
+        , Element.el [ Element.centerX ] <|
+            viewButton "http://elmlang.herokuapp.com/" "Join Now"
+        , Element.el [ Element.centerX ] <|
+            viewLink elmSlack "Already a member? Sign in here."
         ]
 
 
@@ -280,36 +312,41 @@ viewChannels remoteData =
             viewTryAgain RequestChannels
 
         Data channels ->
-            E.column
+            Element.column
                 [ Font.alignLeft
-                , E.spacing 50
-                , E.center
-                , E.width E.shrink
-                , E.attribute (HtmlA.style [ ( "max-width", "600px" ) ])
+                , Element.spacing 50
+                , Element.centerX
+                , Element.width Element.shrink
+                , Element.htmlAttribute (HtmlAttr.style "max-width" "600px")
                 ]
                 (viewTitle "Channels" :: List.map viewChannel channels)
 
 
 viewChannel : Channel -> Element msg
 viewChannel channel =
-    E.column [ E.spacing 10 ]
-        [ E.paragraph [] [ viewBoldLink (elmSlack ++ "messages/" ++ channel.id) ("#" ++ channel.name) ]
+    Element.column [ Element.spacing 10 ]
+        [ Element.paragraph [] [ viewBoldLink (elmSlack ++ "messages/" ++ channel.id) ("#" ++ channel.name) ]
         , viewTopic channel.topic
-        , E.paragraph []
-            [ E.el [ Font.color (Color.rgb 96 181 204), Font.bold ] (E.text (toString channel.members))
-            , E.text " "
-            , E.el [ Font.color (Color.rgb 187 187 187) ] (E.text "members")
+        , Element.paragraph []
+            [ Element.el [ Font.color (Element.rgb255 96 181 204), Font.bold ] (Element.text (String.fromInt channel.members))
+            , Element.text " "
+            , Element.el [ Font.color (Element.rgb255 187 187 187) ] (Element.text "members")
             ]
         ]
 
 
 viewTopic : String -> Element msg
 viewTopic topic =
+    let
+        regex =
+            Regex.fromString "\\s"
+                |> Maybe.withDefault Regex.never
+    in
     topic
-        |> Regex.split Regex.All (Regex.regex "\\s")
+        |> Regex.split regex
         |> List.map viewTopicPart
-        |> List.intersperse (E.text " ")
-        |> E.paragraph []
+        |> List.intersperse (Element.text " ")
+        |> Element.paragraph []
 
 
 urlRegex : Regex
@@ -338,7 +375,7 @@ urlRegex =
 testForUrl : String -> Maybe String
 testForUrl part =
     part
-        |> Regex.find Regex.All urlRegex
+        |> Regex.find urlRegex
         |> List.map .submatches
         |> List.concat
         |> Maybe.values
@@ -352,10 +389,10 @@ viewTopicPart part =
             viewLink url url
 
         Nothing ->
-            E.text part
+            Element.text part
 
 
-viewTimeZones : RemoteData Users -> Maybe Plot.Point -> Window.Size -> Element Msg
+viewTimeZones : RemoteData Users -> Maybe Plot.Point -> WindowSize -> Element Msg
 viewTimeZones remoteData hoveredBar { width } =
     case remoteData of
         Loading ->
@@ -369,14 +406,15 @@ viewTimeZones remoteData hoveredBar { width } =
                 size =
                     if width < 930 then
                         width - 30
+
                     else
                         900
             in
-            E.column
+            Element.column
                 [ Font.alignLeft
-                , E.spacing 50
-                , E.width (E.px size)
-                , E.center
+                , Element.spacing 50
+                , Element.width (Element.px size)
+                , Element.centerX
                 ]
                 [ viewTitle "Time Zones"
                 , viewPlot users hoveredBar size
@@ -394,7 +432,7 @@ viewPlot users hoveredBar size =
                 |> Maybe.andThen (maybeWhen (.x >> (==) x) stuff)
 
         customTick position =
-            { attributes = [ SvgA.stroke "rgb(187, 187, 187)" ]
+            { attributes = [ SvgAttr.stroke "rgb(187, 187, 187)" ]
             , length = 3
             , position = position
             }
@@ -402,7 +440,7 @@ viewPlot users hoveredBar size =
         customAxisLine summary =
             Just
                 (Plot.fullLine
-                    [ SvgA.stroke "rgb(187, 187, 187)"
+                    [ SvgAttr.stroke "rgb(187, 187, 187)"
                     ]
                     summary
                 )
@@ -414,14 +452,14 @@ viewPlot users hoveredBar size =
                     , axisLine = customAxisLine summary
                     , ticks =
                         summary.all
-                            |> List.map (flip (-) summary.min)
+                            |> List.map (\a -> (-) a summary.min)
                             |> List.map customTick
                     , labels = []
                     , flipAnchor = False
                     }
 
         customFlyingHintContainer inner summary hints =
-            Maybe.unwrap (H.text "") (viewCustomFlyingHintContainer inner summary hints) hoveredBar
+            Maybe.unwrap (Html.text "") (viewCustomFlyingHintContainer inner summary hints) hoveredBar
 
         viewCustomFlyingHintContainer inner summary hints point =
             let
@@ -431,6 +469,7 @@ viewPlot users hoveredBar size =
                 range { min, max } =
                     if max - min /= 0 then
                         max - min
+
                     else
                         1
 
@@ -455,67 +494,76 @@ viewPlot users hoveredBar size =
                             List.getAt (floor point.x - 1) (List.reverse summary.y.all)
                                 |> Maybe.unwrap 0 ((*) (1 / summary.y.dataMax))
                     in
-                    ( "top", toString ((440 - 50) * toFloat size / 647 * (1 - top) - 50) ++ "px" )
-
-                style =
-                    [ ( "position", "absolute" )
-                    , verticalPosition
-                    , ( "right", toString (100 - xOffset) ++ "%" )
-                    , ( "pointer-events", "none" )
-                    ]
+                    String.fromFloat ((440 - 50) * toFloat size / 647 * (1 - top) - 50) ++ "px"
             in
-            H.div [ HtmlA.style style ] [ inner hints isLeft isRight ]
+            Html.div
+                [ HtmlAttr.style "position" "absolute"
+                , HtmlAttr.style "top" verticalPosition
+                , HtmlAttr.style "right" (String.fromFloat (100 - xOffset) ++ "%")
+                , HtmlAttr.style "pointer-events" "none"
+                ]
+                [ inner hints isLeft isRight ]
 
         customHintContainerInner hints isLeft isRight =
             let
-                shift attrs =
+                shiftAttrs =
                     if isLeft then
-                        ( "left", "100%" ) :: ( "margin-left", "-22px" ) :: attrs
-                    else if isRight then
-                        ( "right", "-22px" ) :: attrs
-                    else
-                        ( "right", "-50%" ) :: attrs
+                        [ HtmlAttr.style "left" "100%"
+                        , HtmlAttr.style "margin-left" "-22px"
+                        ]
 
-                arrowShift attrs =
-                    if isLeft then
-                        ( "left", "14px" ) :: attrs
                     else if isRight then
-                        ( "right", "14px" ) :: attrs
+                        [ HtmlAttr.style "right" "-22px"
+                        ]
+
                     else
-                        ( "left", "50%" ) :: ( "margin-left", "-6px" ) :: attrs
+                        [ HtmlAttr.style "right" "-50%"
+                        ]
+
+                arrowShiftAttrs =
+                    if isLeft then
+                        [ HtmlAttr.style "left" "14px"
+                        ]
+
+                    else if isRight then
+                        [ HtmlAttr.style "right" "14px"
+                        ]
+
+                    else
+                        [ HtmlAttr.style "left" "50%"
+                        , HtmlAttr.style "margin-left" "-6px"
+                        ]
 
                 arrow =
-                    H.div
-                        [ HtmlA.style <|
-                            arrowShift
-                                [ ( "position", "absolute" )
-                                , ( "top", "100%" )
-                                , ( "width", "0" )
-                                , ( "height", "0" )
-                                , ( "border-left", "6px solid transparent" )
-                                , ( "border-right", "6px solid transparent" )
-                                , ( "border-top", "6px solid rgb(52, 73, 94)" )
-                                ]
-                        ]
+                    Html.div
+                        (arrowShiftAttrs
+                            ++ [ HtmlAttr.style "position" "absolute"
+                               , HtmlAttr.style "top" "100%"
+                               , HtmlAttr.style "width" "0"
+                               , HtmlAttr.style "height" "0"
+                               , HtmlAttr.style "border-left" "6px solid transparent"
+                               , HtmlAttr.style "border-right" "6px solid transparent"
+                               , HtmlAttr.style "border-top" "6px solid rgb(52, 73, 94)"
+                               ]
+                        )
                         []
             in
-            H.div
-                [ HtmlA.style <|
-                    shift
-                        [ ( "line-height", "40px" )
-                        , ( "color", "white" )
-                        , ( "padding", "0 10px" )
-                        , ( "position", "relative" )
-                        , ( "background", "rgb(52, 73, 94)" )
-                        , ( "border-radius", "6px" )
-                        , ( "border", "2px solid #fff" )
-                        ]
-                ]
+            Html.div
+                (shiftAttrs
+                    ++ [ HtmlAttr.style "line-height" "40px"
+                       , HtmlAttr.style "color" "white"
+                       , HtmlAttr.style "padding" "0 10px"
+                       , HtmlAttr.style "position" "relative"
+                       , HtmlAttr.style "background" "rgb(52, 73, 94)"
+                       , HtmlAttr.style "border-radius" "6px"
+                       , HtmlAttr.style "border" "2px solid #fff"
+                       ]
+                )
                 (arrow :: hints)
 
         config =
             { defaultConfig
-                | attributes = [ HtmlA.style [ ( "width", toString size ++ "px" ) ] ]
+                | attributes = [ HtmlAttr.style "width" (String.fromInt size ++ "px") ]
                 , width = 647
                 , height = 440
                 , margin = { top = 0, bottom = 50, right = 25, left = 25 }
@@ -537,9 +585,9 @@ viewPlot users hoveredBar size =
         customLabel label position =
             { view =
                 Plot.viewLabel
-                    [ SvgA.transform "rotate(-60) translate(-3 -3)"
-                    , SvgA.fontSize "8"
-                    , SvgA.fill "rgb(187, 187, 187)"
+                    [ SvgAttr.transform "rotate(-60) translate(-3 -3)"
+                    , SvgAttr.fontSize "8"
+                    , SvgAttr.fill "rgb(187, 187, 187)"
                     ]
                     label
             , position = position
@@ -549,11 +597,11 @@ viewPlot users hoveredBar size =
             { label = customLabel (toUtc timeZone)
             , hint =
                 onHovering
-                    (H.span []
-                        [ H.text (toUtc timeZone ++ ": ")
-                        , H.span
-                            [ HtmlA.style [ ( "font-weight", "bold" ) ] ]
-                            [ H.text (toString number) ]
+                    (Html.span []
+                        [ Html.text (toUtc timeZone ++ ": ")
+                        , Html.span
+                            [ HtmlAttr.style "font-weight" "bold" ]
+                            [ Html.text (String.fromFloat number) ]
                         ]
                     )
             , verticalLine = always Nothing
@@ -568,9 +616,9 @@ viewPlot users hoveredBar size =
             { axis = verticalAxis
             , toGroups = List.map toGroup
             , styles =
-                [ [ SvgA.fill "rgba(96, 181, 204, 0.75)"
-                  , SvgA.stroke "rgb(96, 181, 204)"
-                  , SvgA.strokeWidth "1"
+                [ [ SvgAttr.fill "rgba(96, 181, 204, 0.75)"
+                  , SvgAttr.stroke "rgb(96, 181, 204)"
+                  , SvgAttr.strokeWidth "1"
                   ]
                 ]
             , maxWidth = Plot.Percentage 80
@@ -578,8 +626,8 @@ viewPlot users hoveredBar size =
     in
     users.timeZones
         |> Plot.viewBarsCustom config customBars
-        |> E.html
-        |> E.el []
+        |> Element.html
+        |> Element.el []
 
 
 toUtc : Float -> String
@@ -588,20 +636,24 @@ toUtc offset =
         symbol =
             if offset > 0 then
                 "+"
+
             else if offset == 0 then
                 "±"
+
             else
                 "-"
 
         first =
             if floor (abs offset) < 10 then
-                "0" ++ toString (floor (abs offset))
+                "0" ++ String.fromInt (floor (abs offset))
+
             else
-                toString (floor (abs offset))
+                String.fromInt (floor (abs offset))
 
         last =
             if (abs offset - toFloat (floor (abs offset))) > 0 then
-                toString ((abs offset - toFloat (floor (abs offset))) * 60)
+                String.fromFloat ((abs offset - toFloat (floor (abs offset))) * 60)
+
             else
                 "00"
     in
@@ -610,10 +662,10 @@ toUtc offset =
 
 viewFooter : Element msg
 viewFooter =
-    E.paragraph []
-        [ E.text "All code for this site is open source and written in Elm. "
+    Element.paragraph []
+        [ Element.text "All code for this site is open source and written in Elm. "
         , viewLink "https://github.com/akoppela/elm-lang-slack" "Check it out!"
-        , E.text " — © 2018 Andrey Koppel"
+        , Element.text " — © 2018 Andrey Koppel"
         ]
 
 
@@ -628,49 +680,51 @@ elmSlack =
 
 viewTitle : String -> Element msg
 viewTitle title =
-    E.el
-        [ Area.heading 2
+    Element.el
+        [ Region.heading 2
         , Font.size 40
-        , Font.lineHeight 1
-        , E.paddingEach { top = 0, bottom = 50, left = 0, right = 0 }
+        , Element.paddingEach { top = 0, bottom = 50, left = 0, right = 0 }
+        , Element.centerX
         ]
-        (E.text title)
+        (Element.text title)
 
 
 viewButton : String -> String -> Element msg
 viewButton url label =
-    E.newTabLink
-        [ Background.color (Color.rgb 52 73 94)
+    Element.newTabLink
+        [ Background.color (Element.rgb255 52 73 94)
         , Border.rounded 6
-        , E.padding 12
+        , Element.padding 12
         ]
         { url = url
-        , label = E.el [ Font.color Color.white ] (E.text label)
+        , label =
+            Element.el
+                [ Font.color (Element.rgb255 255 255 255)
+                ]
+                (Element.text label)
         }
 
 
 viewLinkLabel : List (Attribute msg) -> String -> Element msg
 viewLinkLabel attrs label =
-    E.el
+    Element.el
         (List.append
-            [ Font.color (Color.rgb 96 181 204)
-            , Font.mouseOverColor (Color.rgb 234 21 122)
+            [ Font.color (Element.rgb255 96 181 204)
             , Font.underline
-            , E.attribute
-                (HtmlA.style
-                    [ ( "white-space", "normal" )
-                    , ( "word-break", "break-all" )
-                    ]
-                )
+            , Element.htmlAttribute (HtmlAttr.style "white-space" "normal")
+            , Element.htmlAttribute (HtmlAttr.style "word-break" "break-all")
+            , Element.mouseOver
+                [ Font.color (Element.rgb255 234 21 122)
+                ]
             ]
             attrs
         )
-        (E.text label)
+        (Element.text label)
 
 
 viewLink : String -> String -> Element msg
 viewLink url label =
-    E.newTabLink []
+    Element.newTabLink []
         { url = url
         , label = viewLinkLabel [] label
         }
@@ -678,7 +732,7 @@ viewLink url label =
 
 viewBoldLink : String -> String -> Element msg
 viewBoldLink url label =
-    E.newTabLink []
+    Element.newTabLink []
         { url = url
         , label = viewLinkLabel [ Font.bold ] label
         }
@@ -691,15 +745,15 @@ viewLinkWithMsg msg label =
 
 viewLoading : String -> Element msg
 viewLoading text =
-    E.text ("Loading " ++ text ++ " ...")
+    Element.text ("Loading " ++ text ++ " ...")
 
 
 viewTryAgain : msg -> Element msg
 viewTryAgain msg =
-    E.paragraph []
-        [ E.text "There was an error. Please "
+    Element.paragraph []
+        [ Element.text "There was an error. Please "
         , viewLinkWithMsg msg "try again"
-        , E.text "."
+        , Element.text "."
         ]
 
 
@@ -715,5 +769,6 @@ maybeWhen : (a -> Bool) -> b -> a -> Maybe b
 maybeWhen test returnValue givenValue =
     if test givenValue then
         Just returnValue
+
     else
         Nothing

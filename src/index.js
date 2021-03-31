@@ -1,15 +1,14 @@
 (function () {
-    'use strict';
-
-    // Clear document body before start
-    while (document.body.hasChildNodes()) {
-        document.body.removeChild(document.body.lastChild);
-    }
-
     // Initialize Elm app
-    var Elm = require('../src/Main'),
-        width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
-        height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    var height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    var Main = require('./Main.elm').Elm.Main;
 
-    Elm.Main.embed(document.body, { width: width, height: height });
-})();
+    Main.init({
+        node: document.getElementById('loading'),
+        flags: {
+            width: width,
+            height: height,
+        },
+    });
+}());
