@@ -1,15 +1,15 @@
-var functions = require('firebase-functions'),
-    admin = require('firebase-admin'),
-    cors = require('cors')({ origin: true }),
-    querystring = require('querystring'),
-    request = require('request'),
-    config = functions.config();
+var functions = require('firebase-functions');
+var admin = require('firebase-admin');
+var cors = require('cors')({ origin: true });
+var querystring = require('querystring');
+var request = require('request');
+var config = functions.config();
 
 // Initialize app
 admin.initializeApp(config.firebase);
 
-var usersRef = admin.firestore().collection("members").doc("data"),
-    channelsRef = admin.firestore().collection("channels").doc("data");
+var usersRef = admin.firestore().collection('members').doc('data');
+var channelsRef = admin.firestore().collection('channels').doc('data');
 
 /**
  * Exports `updateUsers` function to Firebase
@@ -37,15 +37,16 @@ exports.updateUsers = functions.https.onRequest(function (request, response) {
                     } else {
                         accumulator.push({
                             timeZone: timeZone,
-                            number: 1
+                            number: 1,
                         });
                     }
+
                     return accumulator;
                 }, []);
 
             usersRef.set({
                 total: data.members.length.toString(),
-                timeZones: timeZones
+                timeZones: timeZones,
             });
         }
 
@@ -59,7 +60,7 @@ exports.updateUsers = functions.https.onRequest(function (request, response) {
 exports.updateChannels = functions.https.onRequest(function (request, response) {
     var params = {
         exclude_archived: true,
-        exclude_members: true
+        exclude_members: true,
     };
 
     cors(request, response, function () {});
@@ -72,7 +73,7 @@ exports.updateChannels = functions.https.onRequest(function (request, response) 
                         id: channel.id,
                         name: channel.name,
                         topic: channel.topic.value,
-                        members: channel.num_members
+                        members: channel.num_members,
                     };
                 })
                 .sort(function (a, b) {
