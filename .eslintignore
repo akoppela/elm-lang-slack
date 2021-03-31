@@ -1,0 +1,4 @@
+node_modules
+docker/build
+elm-stuff
+dist

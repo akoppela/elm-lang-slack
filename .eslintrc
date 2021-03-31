@@ -1,0 +1,124 @@
+{
+    "root": true,
+    "plugins": [
+    ],
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": 2015
+    },
+    "settings": {
+    },
+    "rules": {
+        "one-var": ["error", {
+            "initialized": "never"
+        }],
+        "newline-after-var": ["error", "always"],
+        "no-shadow": "error",
+        "no-shadow-restricted-names": "error",
+        "comma-dangle": ["error", "always-multiline"],
+        "new-cap": "error",
+        "no-else-return": ["error", {
+            "allowElseIf": false
+        }],
+        "no-nested-ternary": "error",
+        "indent": ["error", 4, {
+            "SwitchCase": 1,
+            "flatTernaryExpressions": true
+        }],
+        "no-multi-spaces": "error",
+        "no-empty": ["error", {
+            "allowEmptyCatch": true
+        }],
+        "no-with": "error",
+        "brace-style": ["error", "1tbs"],
+        "key-spacing": ["error", {
+            "beforeColon": false,
+            "afterColon": true
+        }],
+        "quote-props": ["error", "as-needed"],
+        "array-bracket-spacing": "error",
+        "space-in-parens": "error",
+        "padded-blocks": ["error", "never"],
+        "yoda": ["error", "never"],
+        "no-multi-str": "error",
+        "no-mixed-spaces-and-tabs": "error",
+        "space-unary-ops": ["error", {
+            "words": false,
+            "nonwords": false
+        }],
+        "func-call-spacing": "error",
+        "linebreak-style": ["error", "unix"],
+        "quotes": ["error", "single"],
+        "spaced-comment": ["error", "always"],
+        "no-trailing-spaces": "error",
+        "semi": ["error", "always"],
+        "semi-spacing": "error",
+        "semi-style": ["error", "last"],
+        "no-extra-semi": "error",
+        "wrap-iife": "error",
+        "dot-notation": ["error", {
+            "allowPattern": "^[a-z]+(_[a-z]+)+$"
+        }],
+        "operator-linebreak": ["error", "after"],
+        "camelcase": ["error", {
+            "properties": "always"
+        }],
+        "space-before-function-paren": ["error", {
+            "anonymous": "always",
+            "named": "never"
+        }],
+        "no-implicit-coercion": ["error", {
+            "boolean": true,
+            "string": true,
+            "number": true
+        }],
+        "keyword-spacing": "error",
+        "space-infix-ops": "error",
+        "curly": ["error", "all"],
+        "space-before-blocks": ["error", "always"],
+        "consistent-this": ["error", "vm", "provider"],
+        "comma-style": ["error", "last"],
+        "no-dupe-args": "error",
+        "no-dupe-keys": "error",
+        "no-duplicate-case": "error",
+        "no-underscore-dangle": "error",
+        "no-multiple-empty-lines": ["error", {
+            "max": 1
+        }],
+        "comma-spacing": "error",
+        "no-whitespace-before-property": "error",
+        "computed-property-spacing": "error",
+        "block-spacing": "error",
+        "object-curly-spacing": ["error", "always"],
+        "switch-colon-spacing": "error",
+        "no-extra-parens": ["error", "all", {
+            "conditionalAssign": false
+        }],
+        "padding-line-between-statements": ["error", {
+            "blankLine": "always",
+            "prev": "*",
+            "next": ["block-like", "throw", "return"]
+        }, {
+            "blankLine": "always",
+            "prev": ["block-like", "break", "directive", "case", "default"],
+            "next": "*"
+        }, {
+            "blankLine": "any",
+            "prev": "case",
+            "next": "case"
+        }],
+        "no-case-declarations": "error",
+        "no-fallthrough": "error",
+        "max-statements-per-line": "error",
+        "for-direction": "error",
+        "getter-return": "error",
+        "no-compare-neg-zero": "error",
+        "no-cond-assign": "error",
+        "no-constant-condition": "error",
+        "no-undef": "error",
+        "no-redeclare": "error",
+        "no-unused-vars": "error",
+        "func-style": ["error", "declaration"],
+        "strict": "error"
+    }
+}
