@@ -8,7 +8,7 @@
     },
     "scripts": {
         "start": "parcel src/index.html",
-        "build": "rimraf docker/build && webpack",
+        "build": "rimraf docker/build && parcel build src/index.html -d docker/build --no-source-maps --no-cache",
         "update": "npm prune && npm install"
     },
     "keywords": [
