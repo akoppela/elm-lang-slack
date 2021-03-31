@@ -5,3 +5,5 @@ npm-debug.log
 firebase-debug.log
 .runtimeconfig.json
 .direnv
+dist
+.cache
