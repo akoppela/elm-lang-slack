@@ -4,3 +4,4 @@ build
 npm-debug.log
 firebase-debug.log
 .runtimeconfig.json
+.direnv
