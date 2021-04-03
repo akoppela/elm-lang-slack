@@ -364,6 +364,7 @@ urlRegex =
                 >> VerEx.somethingBut ">"
             )
         |> VerEx.possibly ">"
+        |> VerEx.possibly "."
         |> VerEx.endOfLine
         |> VerEx.withAnyCase True
         |> VerEx.toRegex
