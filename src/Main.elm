@@ -260,7 +260,8 @@ view model =
         , Element.paddingXY 15 100
         ]
         (Element.column
-            [ Element.spacing 100
+            [ Element.width Element.fill
+            , Element.spacing 100
             , Element.centerX
             ]
             [ viewHeader model.users
@@ -278,7 +279,8 @@ viewHeader remoteData =
             Maybe.unwrap "" .number (data remoteData)
     in
     Element.column
-        [ Element.spacing 50
+        [ Element.width Element.fill
+        , Element.spacing 50
         , Element.centerX
         ]
         [ Element.el [ Element.centerX ] (ElmLogo.element 70)
@@ -289,16 +291,11 @@ viewHeader remoteData =
             , Element.centerX
             ]
             (Element.text "elm")
-        , Element.column
-            [ Element.spacing 10 ]
-            [ Element.paragraph [] [ Element.text ("We are a community of " ++ usersNumber) ]
-            , Element.paragraph [] [ Element.text "Elm language developers from all over the world." ]
-            , Element.paragraph [] [ Element.text "Join us and talk on Slack!" ]
-            ]
+        , Element.paragraph [] [ Element.text ("We are a community of " ++ usersNumber ++ " Elm language developers from all over the world.") ]
+        , Element.paragraph [] [ Element.text "Join us and talk on Slack!" ]
         , Element.el [ Element.centerX ] <|
             viewButton "http://elmlang.herokuapp.com/" "Join Now"
-        , Element.el [ Element.centerX ] <|
-            viewLink elmSlack "Already a member? Sign in here."
+        , Element.paragraph [ Element.centerX ] [ viewLink elmSlack "Already a member? Sign in here." ]
         ]
 
 
@@ -740,12 +737,17 @@ viewBoldLink url label =
 
 viewLinkWithMsg : msg -> String -> Element msg
 viewLinkWithMsg msg label =
-    viewLinkLabel [ Events.onClick msg ] label
+    viewLinkLabel
+        [ Events.onClick msg
+        , Element.pointer
+        ]
+        label
 
 
 viewLoading : String -> Element msg
 viewLoading text =
-    Element.text ("Loading " ++ text ++ " ...")
+    Element.el [ Element.centerX ] <|
+        Element.text ("Loading " ++ text ++ " ...")
 
 
 viewTryAgain : msg -> Element msg
