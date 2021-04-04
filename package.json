@@ -18,7 +18,7 @@
     "author": "Andrey Koppel (akoppela)",
     "license": "BSD3",
     "dependencies": {
-        "parcel-bundler": "^1.12.5",
+        "parcel-bundler": "1.12.5",
         "rimraf": "3.0.2"
     },
     "devDependencies": {
