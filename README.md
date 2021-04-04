@@ -1,11 +1,17 @@
 # Elm Language Slack official website
 
-## How to install
+## Dependencies
+
+- [`nix`](https://nixos.org)
+
+## Install
 
 - `git clone git@github.com:akoppela/elm-lang-slack.git`
 - `cd elm-lang-slack`
-- `npm run update`
+- `nix-shell`
 
-## How to run
+## Develop
 
+- `cd elm-lang-slack`
+- `nix-shell`
 - `npm start`

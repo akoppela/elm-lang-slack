@@ -1,6 +1,6 @@
 elm-stuff
 node_modules
-build
+release
 npm-debug.log
 firebase-debug.log
 .runtimeconfig.json

@@ -1,13 +1,18 @@
 { pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/tarball/20.09") { }
 }:
-pkgs.mkShell {
-  buildInputs = [
+let
+  buildInputs = (import ./nix/buildInputs.nix { inherit pkgs; }).all;
+
+  devBuildInputs = [
     # Node
-    pkgs.nodejs-14_x
     pkgs.nodePackages.eslint
+    pkgs.nodePackages.node2nix
 
     # Elm
-    pkgs.elmPackages.elm
     pkgs.elmPackages.elm-format
+    pkgs.elm2nix
   ];
+in
+pkgs.mkShell {
+  buildInputs = buildInputs ++ devBuildInputs;
 }

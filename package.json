@@ -7,9 +7,8 @@
         "url": "https://github.com/akoppela/elm-lang-slack.git"
     },
     "scripts": {
-        "start": "parcel src/index.html",
-        "build": "rimraf docker/build && parcel build src/index.html -d docker/build --no-source-maps --no-cache",
-        "update": "npm prune && npm install"
+        "build": "rm -rf release && parcel build src/index.html -d release --no-source-maps --no-cache",
+        "start": "parcel src/index.html"
     },
     "keywords": [
         "Elm",
@@ -18,12 +17,11 @@
     "author": "Andrey Koppel (akoppela)",
     "license": "BSD3",
     "dependencies": {
-        "parcel-bundler": "1.12.5",
-        "rimraf": "3.0.2"
+        "cssnano": "4.1.10",
+        "node-elm-compiler": "5.0.5",
+        "parcel-bundler": "1.12.5"
     },
     "devDependencies": {
-        "elm": "^0.19.1-5",
-        "elm-hot": "^1.1.6",
-        "node-elm-compiler": "^5.0.5"
+        "elm-hot": "1.1.6"
     }
 }
