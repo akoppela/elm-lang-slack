@@ -7,8 +7,10 @@
         "url": "https://github.com/akoppela/elm-lang-slack.git"
     },
     "scripts": {
-        "build": "rm -rf release && parcel build src/index.html -d release --no-source-maps --no-cache",
-        "start": "parcel src/index.html"
+        "app:build": "rm -rf release && parcel build src/index.html -d release --no-source-maps --no-cache",
+        "app:start": "parcel src/index.html",
+        "nix:sync:elm": "elm2nix convert > nix/elm/elm-srcs.nix && elm2nix snapshot && mv registry.dat nix/elm/registry.dat",
+        "nix:sync:node": "cd nix/node && node2nix -i ../../package.json -l ../../package-lock.json"
     },
     "keywords": [
         "Elm",

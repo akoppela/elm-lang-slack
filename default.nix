@@ -29,7 +29,7 @@ pkgs.stdenv.mkDerivation {
   configurePhase = configureNode + configureElm;
 
   buildPhase = ''
-    npm run build
+    npm run app:build
   '';
 
   installPhase = ''
