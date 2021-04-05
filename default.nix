@@ -14,11 +14,7 @@ let
     ln -s ${nodeDependencies}/lib/node_modules ./node_modules
   '';
 
-  configureElm = pkgs.elmPackages.fetchElmDeps {
-    elmPackages = import ./nix/elm/elm-srcs.nix;
-    registryDat = ./nix/elm/registry.dat;
-    elmVersion = "0.19.1";
-  };
+  configureElm = import ./nix/elm/default.nix { inherit pkgs; };
 in
 pkgs.stdenv.mkDerivation {
   name = "elm-lang-slack";
