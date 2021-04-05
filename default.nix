@@ -5,7 +5,7 @@ let
   buildInputs = import ./nix/buildInputs.nix { inherit pkgs; };
 
   nodeDependencies =
-    (pkgs.callPackage ./nix/node/default.nix {
+    (import ./nix/node/default.nix {
       inherit pkgs;
       inherit (buildInputs) nodejs;
     }).shell.nodeDependencies;
